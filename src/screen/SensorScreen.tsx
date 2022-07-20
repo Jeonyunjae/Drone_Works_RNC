@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import * as React from 'react';
 
-import {runOnJS} from 'react-native-reanimated';
 import {
   StyleSheet,
   View,
@@ -18,37 +17,53 @@ import {
   useFrameProcessor,
   Camera,
 } from 'react-native-vision-camera';
-import { accelerometer, gyroscope, SensorTypes, setUpdateIntervalForType } from 'react-native-sensors';
-import { map, filter } from "rxjs/operators";
-import { useState } from 'react';
+import {
+  accelerometer,
+  gyroscope,
+  SensorTypes,
+  setUpdateIntervalForType,
+} from 'react-native-sensors';
+import {map, filter} from 'rxjs/operators';
+import {useState} from 'react';
+import { runOnJS } from 'react-native-reanimated';
 
+setUpdateIntervalForType(SensorTypes.gyroscope, 400); // defaults to 100ms
 
-setUpdateIntervalForType(SensorTypes.accelerometer, 400); // defaults to 100ms
-
-export default function SensorScreen() {
+export default function SensorScreen({navigation}: any) {
   const [hasPermission, setHasPermission] = React.useState(false);
   const [ocr, setOcr] = React.useState<OCRFrame>();
   const [pixelRatio, setPixelRatio] = React.useState<number>(1);
   const devices = useCameraDevices();
   const device = devices.back;
 
-  const [value_X, setValue_X] = useState(0);
-  const [value_Y, setValue_Y] = useState(0);
-  const [value_Z, setValue_Z] = useState(0);
-  const [value_SUM, setValue_SUM] = useState(0);
+  const [X, setX] = useState(0);
+  const [Y, setY] = useState(0);
+  const [Z, setZ] = useState(0);
+  const [moveValue, setMoveValue] = useState(0);
+  const [moveFlag, setMoveFlag] = useState(false);
 
-
-  //gyroscope ->value_SUM 0.1 이하
   const subscription = gyroscope.subscribe(({x, y, z, timestamp}) => {
-    setValue_X(x), setValue_Y(y), setValue_Z(z),setValue_SUM((Math.abs(x)+Math.abs(y)+Math.abs(z)));
-  });
+    let tempMoveValue:number = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
+    setX(x);
+    setY(y);
+    setZ(z);
+
+    if (tempMoveValue < 0.1) {
+      if(tempMoveValue != moveValue){
+        setMoveFlag(true);
+        setMoveValue(tempMoveValue);
+      }
+    }
+  });
 
   const frameProcessor = useFrameProcessor(frame => {
     'worklet';
-    const data = scanOCR(frame);
-    console.log(JSON.stringify(data));
-    runOnJS(setOcr)(data);
+    if(moveFlag == true){
+      console.log(moveValue);
+      //ocr
+      runOnJS(setMoveFlag)(false);
+    }
   }, []);
 
   React.useEffect(() => {
@@ -110,10 +125,10 @@ export default function SensorScreen() {
       />
       {renderOverlay()}
 
-      <Text>X={value_X}</Text>
-      <Text>Y={value_Y}</Text>
-      <Text>Z={value_Z}</Text>
-      <Text>value_SUM={value_SUM}</Text>
+      <Text style={{ color: "white" }}>value_SUM={moveValue}</Text>
+      <Text style={{ color: "white" }}>x={X}</Text>
+      <Text style={{ color: "white" }}>y={Y}</Text>
+      <Text style={{ color: "white" }}>z={Z}</Text>
     </>
   ) : (
     <View>

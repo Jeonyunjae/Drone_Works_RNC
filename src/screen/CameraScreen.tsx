@@ -21,7 +21,7 @@ import {
 } from 'react-native-vision-camera';
 import {accelerometer} from 'react-native-sensors';
 
-export default function CameraScreen() {
+export default function CameraScreen({navigation}:any) {
   const [hasPermission, setHasPermission] = React.useState(false);
   const [ocr, setOcr] = React.useState<OCRFrame>();
   const [pixelRatio, setPixelRatio] = React.useState<number>(1);
