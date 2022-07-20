@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   Alert,
   Clipboard,
-  Button,
 } from 'react-native';
 import {OCRFrame, scanOCR} from 'vision-camera-ocr';
 import {
@@ -19,18 +18,31 @@ import {
   useFrameProcessor,
   Camera,
 } from 'react-native-vision-camera';
-import {accelerometer} from 'react-native-sensors';
+import { accelerometer, gyroscope, SensorTypes, setUpdateIntervalForType } from 'react-native-sensors';
+import { map, filter } from "rxjs/operators";
+import { useState } from 'react';
 
-export default function CameraScreen() {
+
+setUpdateIntervalForType(SensorTypes.accelerometer, 400); // defaults to 100ms
+
+export default function SensorScreen() {
   const [hasPermission, setHasPermission] = React.useState(false);
   const [ocr, setOcr] = React.useState<OCRFrame>();
   const [pixelRatio, setPixelRatio] = React.useState<number>(1);
   const devices = useCameraDevices();
   const device = devices.back;
-  let value: string = '';
-  const subscription = accelerometer.subscribe(
-    ({x, y, z, timestamp}) => (value = 'x=' + x + 'y=' + y + 'z=' + z),
-  );
+
+  const [value_X, setValue_X] = useState(0);
+  const [value_Y, setValue_Y] = useState(0);
+  const [value_Z, setValue_Z] = useState(0);
+  const [value_SUM, setValue_SUM] = useState(0);
+
+
+  //gyroscope ->value_SUM 0.1 이하
+  const subscription = gyroscope.subscribe(({x, y, z, timestamp}) => {
+    setValue_X(x), setValue_Y(y), setValue_Z(z),setValue_SUM((Math.abs(x)+Math.abs(y)+Math.abs(z)));
+  });
+
 
   const frameProcessor = useFrameProcessor(frame => {
     'worklet';
@@ -96,23 +108,12 @@ export default function CameraScreen() {
           );
         }}
       />
-      {/* <Button
-        title="Go to Details... again"
-        //onPress={() => navigation.navigate('Details')}
-      /> */}
+      {renderOverlay()}
 
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Text
-          style={{
-            fontSize: 25,
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}>
-          {value}
-        </Text>
-      </View>
-
-      {/* {renderOverlay()} */}
+      <Text>X={value_X}</Text>
+      <Text>Y={value_Y}</Text>
+      <Text>Z={value_Z}</Text>
+      <Text>value_SUM={value_SUM}</Text>
     </>
   ) : (
     <View>

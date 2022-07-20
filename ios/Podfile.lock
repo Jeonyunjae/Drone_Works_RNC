@@ -443,6 +443,8 @@ PODS:
   - RNScreens (3.15.0):
     - React-Core
     - React-RCTImage
+  - RNSensors (7.3.5):
+    - React-Core
   - SocketRocket (0.6.0)
   - vision-camera-ocr (1.0.0):
     - GoogleMLKit/TextRecognition (= 2.2.0)
@@ -514,6 +516,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSensors (from `../node_modules/react-native-sensors`)
   - vision-camera-ocr (from `../node_modules/vision-camera-ocr`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -618,6 +621,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSensors:
+    :path: "../node_modules/react-native-sensors"
   vision-camera-ocr:
     :path: "../node_modules/vision-camera-ocr"
   VisionCamera:
@@ -686,6 +691,7 @@ SPEC CHECKSUMS:
   ReactCommon: e30ec17dfb1d4c4f3419eac254350d6abca6d5a2
   RNReanimated: 2cf7451318bb9cc430abeec8d67693f9cf4e039c
   RNScreens: 4a1af06327774490d97342c00aee0c2bafb497b7
+  RNSensors: e74c8bd9606400c1048ab67af7f41eb2091cb2fc
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   vision-camera-ocr: 484b73b1917f608ff36d6c041b2e2a48dfd290e6
   VisionCamera: 81b9c14c2d5abeb4ddcc273446d93b5d1654b892
