@@ -62,6 +62,7 @@ export default function SensorScreen({navigation}: any) {
     if(moveFlag == true){
       console.log(moveValue);
       //ocr
+      scanOCR
       runOnJS(setMoveFlag)(false);
     }
   }, []);
@@ -113,6 +114,7 @@ export default function SensorScreen({navigation}: any) {
         frameProcessor={frameProcessor}
         device={device}
         isActive={true}
+        fps={60}
         frameProcessorFps={5}
         onLayout={(event: LayoutChangeEvent) => {
           setPixelRatio(

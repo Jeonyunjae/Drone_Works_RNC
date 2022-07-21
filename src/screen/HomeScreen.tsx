@@ -16,6 +16,7 @@ import {
   useCameraDevices,
   useFrameProcessor,
   Camera,
+  Frame,
 } from 'react-native-vision-camera';
 import {
   accelerometer,
@@ -25,7 +26,7 @@ import {
 } from 'react-native-sensors';
 import {map, filter} from 'rxjs/operators';
 import {useState} from 'react';
-import { runOnJS } from 'react-native-reanimated';
+import {runOnJS} from 'react-native-reanimated';
 
 setUpdateIntervalForType(SensorTypes.gyroscope, 400); // defaults to 100ms
 
@@ -35,35 +36,39 @@ export default function HomeScreen({navigation}: any) {
   const [pixelRatio, setPixelRatio] = React.useState<number>(1);
   const devices = useCameraDevices();
   const device = devices.back;
+  let _moveValue: number = 0;
+  let _moveFlag: boolean = false;
 
   const [X, setX] = useState(0);
   const [Y, setY] = useState(0);
   const [Z, setZ] = useState(0);
-  const [moveValue, setMoveValue] = useState(0);
-  const [moveFlag, setMoveFlag] = useState(false);
 
   const subscription = gyroscope.subscribe(({x, y, z, timestamp}) => {
-    let tempMoveValue:number = Math.abs(x) + Math.abs(y) + Math.abs(z);
+    let tempMoveValue: number = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
     setX(x);
     setY(y);
     setZ(z);
 
     if (tempMoveValue < 0.1) {
-      if(tempMoveValue != moveValue){
-        setMoveFlag(true);
-        setMoveValue(tempMoveValue);
+      if (tempMoveValue != _moveValue) {
+        _moveFlag = true;
+        _moveValue = tempMoveValue;
+        
       }
     }
   });
 
-  const frameProcessor = useFrameProcessor(frame => {
-    'worklet';
-    if(moveFlag == true){
-      console.log(moveValue);
-      //ocr
-      runOnJS(setMoveFlag)(false);
+  function log (frame :Frame){
+    if(_moveFlag){
+
+      console.log("frameframe"+frame.toString);
+      _moveFlag = false;
     }
+  }
+  const frameProcessor = useFrameProcessor(frame => {
+    'worklet'
+    runOnJS(log)(frame);
   }, []);
 
   React.useEffect(() => {
@@ -125,10 +130,10 @@ export default function HomeScreen({navigation}: any) {
       />
       {renderOverlay()}
 
-      <Text style={{ color: "white" }}>value_SUM={moveValue}</Text>
-      <Text style={{ color: "white" }}>x={X}</Text>
-      <Text style={{ color: "white" }}>y={Y}</Text>
-      <Text style={{ color: "white" }}>z={Z}</Text>
+      <Text style={{color: 'white'}}>value_SUM={_moveValue}</Text>
+      <Text style={{color: 'white'}}>x={X}</Text>
+      <Text style={{color: 'white'}}>y={Y}</Text>
+      <Text style={{color: 'white'}}>z={Z}</Text>
     </>
   ) : (
     <View>
